@@ -9,6 +9,3 @@
 </p>
 
 
-
-
-**Note:** The website is edited from the Resume theme from: https://startbootstrap.com/template-overviews/resume/
