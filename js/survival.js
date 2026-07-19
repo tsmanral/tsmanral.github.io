@@ -66,55 +66,8 @@
     requestAnimationFrame(tick);
   }
 
-  /* ================= NPC dialogue system ================= */
-  var lines = [
-    "Welcome to the frontier, traveler! ❄️ I'm your guide. This village belongs to Tribhuwan Singh — a Software Developer with 4 years of experience surviving enterprise-scale winters.",
-    "His main campaign? Four years at IBM, Seattle — taming high-throughput APIs that handle 100K+ daily records at 99.9% reliability. The 📜 Main Quests hub holds the full log.",
-    "He forged asynchronous AWS Lambda ETL pipelines moving 1M+ records a day, slashed API latency 40% with Redis, and cut security vulnerabilities by 90%. Legendary loot.",
-    "Right now he's leveling up a Cybersecurity specialization at Westcliff University — and building Last-Sanctuary, his own survival game. Check the 🎒 Inventory and 🗺️ Expeditions hubs!",
-    "Your mission: explore the village. Click any quest hub below to begin. Good luck out there, survivor. 🔥"
-  ];
-
-  var idx = 0;
-  var typing = null;
-  var textEl = document.getElementById('npc-text');
-  var nextBtn = document.getElementById('npc-next');
-  var progEl = document.getElementById('npc-progress');
-
-  function showLine(i, instant) {
-    if (typing) { clearInterval(typing); typing = null; }
-    var line = lines[i];
-    progEl.textContent = (i + 1) + ' / ' + lines.length;
-    nextBtn.textContent = i === lines.length - 1 ? 'Restart ↺' : 'Continue ▸';
-    textEl.classList.remove('done');
-    if (instant || reducedMotion) {
-      textEl.textContent = line;
-      textEl.classList.add('done');
-      return;
-    }
-    textEl.textContent = '';
-    var pos = 0;
-    typing = setInterval(function () {
-      pos += 2; // two chars per tick keeps it snappy
-      textEl.textContent = line.slice(0, pos);
-      if (pos >= line.length) {
-        clearInterval(typing);
-        typing = null;
-        textEl.classList.add('done');
-      }
-    }, 18);
-  }
-
-  if (textEl && nextBtn) {
-    nextBtn.addEventListener('click', function () {
-      if (typing) { showLine(idx, true); return; } // skip animation
-      idx = (idx + 1) % lines.length;
-      showLine(idx);
-    });
-    showLine(0);
-  }
-
   /* ================= Mobile HUD toggle ================= */
+  /* (NPC dialogue now lives in the playable village — see js/game.js) */
   var toggle = document.getElementById('hud-toggle');
   var nav = document.getElementById('hud-nav');
   if (toggle && nav) {
@@ -165,6 +118,34 @@
     return n;
   }
 
+  /* Read each repo's README and pull a proper title (first `#` heading)
+     and a clean summary (first substantial paragraph). */
+  function enrichFromReadme(repo) {
+    return fetch('https://raw.githubusercontent.com/tsmanral/' + encodeURIComponent(repo.name) + '/HEAD/README.md')
+      .then(function (res) { return res.ok ? res.text() : ''; })
+      .catch(function () { return ''; })
+      .then(function (md) {
+        if (md) {
+          var heading = md.match(/^#\s+(.+)$/m);
+          if (heading) {
+            var title = heading[1].replace(/[#*_`]/g, '').trim();
+            if (title.length > 2 && title.length <= 80) repo.displayName = title;
+          }
+          var body = md
+            .replace(/```[\s\S]*?```/g, '')            // code blocks
+            .replace(/^#{1,6}\s.*$/gm, '')             // headings
+            .replace(/!\[[^\]]*\]\([^)]*\)/g, '')      // images/badges
+            .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')   // links -> text
+            .replace(/^[>|-]\s?/gm, '')
+            .split(/\n\s*\n/)
+            .map(function (p) { return p.replace(/\s+/g, ' ').trim(); })
+            .filter(function (p) { return p.length > 40 && !/^!|^http/.test(p); })[0];
+          if (body) repo.summary = body.length > 200 ? body.slice(0, 197) + '…' : body;
+        }
+        return repo;
+      });
+  }
+
   function renderProjects(repos) {
     var grid = document.getElementById('proj-grid');
     if (!grid) return;
@@ -185,11 +166,11 @@
 
       var name = document.createElement('span');
       name.className = 'proj__name';
-      name.textContent = prettyName(r.name);
+      name.textContent = r.displayName || prettyName(r.name);
 
       var desc = document.createElement('span');
       desc.className = 'proj__desc';
-      desc.textContent = r.description || 'A field expedition — open the repository for the full report.';
+      desc.textContent = r.summary || r.description || 'A field expedition — open the repository for the full report.';
 
       var meta = document.createElement('span');
       meta.className = 'proj__meta';
@@ -235,7 +216,10 @@
             return (b.stargazers_count - a.stargazers_count) || (new Date(b.pushed_at) - new Date(a.pushed_at));
           })
           .slice(0, 12);
-        renderProjects(filtered.length ? filtered : FALLBACK);
+        if (!filtered.length) { renderProjects(FALLBACK); return; }
+        // Render immediately with API data, then re-render once READMEs arrive
+        renderProjects(filtered);
+        return Promise.all(filtered.map(enrichFromReadme)).then(renderProjects);
       })
       .catch(function () { renderProjects(FALLBACK); });
   }
