@@ -35,42 +35,50 @@
     <button class="hud__toggle" id="hud-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
   </header>
 
-  <!-- ===== HOME / SURVIVOR'S VILLAGE ===== -->
-  <section class="village" id="basecamp">
-    <div class="village__map" role="img" aria-label="Isometric arctic survivor village with log cabins and a central bonfire"></div>
-    <div class="village__vignette"></div>
+  <!-- ===== HOME / PLAYABLE SURVIVOR'S VILLAGE ===== -->
+  <section class="village village--game" id="basecamp">
+    <canvas id="game-canvas" aria-label="Playable survivor village: walk with WASD, arrow keys, or click-to-move and talk to NPCs to explore the portfolio" tabindex="0"></canvas>
 
-    <div class="village__content">
-      <p class="village__kicker">❄️ DAY 1,460 OF THE EXPEDITION · BENGALURU OUTPOST</p>
-      <h1 class="village__title">Tribhuwan <span>Singh</span></h1>
-      <p class="village__subtitle">Software Developer · Backend &amp; Distributed Systems · Lv. 4+ yrs</p>
+    <div class="game-ui">
+      <div class="game-title">
+        <p class="village__kicker">❄️ SURVIVOR'S FRONTIER · AN EXPLORABLE PORTFOLIO</p>
+        <h1 class="village__title">Tribhuwan <span>Singh</span></h1>
+        <p class="village__subtitle">Software Developer · Backend &amp; Distributed Systems · Lv. 4+ yrs</p>
+        <div class="game-title__actions">
+          <a class="btn btn--amber" href="assets/Tribhuwan_Singh_Resume.pdf" download="Tribhuwan_Singh_Resume.pdf">📄 Download Resume</a>
+          <a class="btn btn--blue" href="#quests">↓ Skip the game, just scroll</a>
+        </div>
+      </div>
 
-      <!-- Interactive NPC guide -->
-      <div class="npc" id="npc">
+      <div class="game-hint" id="game-hint">🎮 WASD / arrows / click to move · walk up to a villager and press <b>E</b> (or tap them) to interact</div>
+
+      <div class="game-prompt" id="game-prompt" hidden></div>
+
+      <!-- In-game dialogue box -->
+      <div class="npc game-dialogue" id="game-dialogue" hidden>
         <div class="npc__avatar">
-          <img src="img/arctic-explorer.png" alt="Arctic Explorer guide" width="96" height="96" loading="eager">
+          <img src="img/arctic-explorer.png" alt="" width="96" height="96" id="dialogue-avatar">
         </div>
         <div class="npc__bubble">
-          <p class="npc__name">Arctic Explorer <span class="npc__tag">GUIDE</span></p>
+          <p class="npc__name"><span id="dialogue-name">Arctic Explorer</span> <span class="npc__tag" id="dialogue-tag">GUIDE</span></p>
           <p class="npc__text" id="npc-text" aria-live="polite"></p>
           <div class="npc__actions">
             <button class="btn btn--amber" id="npc-next">Continue ▸</button>
+            <button class="btn btn--blue" id="dialogue-close">Close ✕</button>
             <span class="npc__progress" id="npc-progress"></span>
           </div>
         </div>
       </div>
-
-      <!-- Quest hubs: clickable village navigation -->
-      <div class="hubs" aria-label="Quest hubs">
-        <a class="hub" href="#quests"><span class="hub__icon">📜</span><span class="hub__label">Main Quests</span><span class="hub__hint">Work Experience</span></a>
-        <a class="hub" href="#inventory"><span class="hub__icon">🎒</span><span class="hub__label">Equipment</span><span class="hub__hint">Skills</span></a>
-        <a class="hub" href="#training"><span class="hub__icon">🎓</span><span class="hub__label">Training Camp</span><span class="hub__hint">Education</span></a>
-        <a class="hub" href="#expeditions"><span class="hub__icon">🗺️</span><span class="hub__label">Expeditions</span><span class="hub__hint">GitHub Projects</span></a>
-      </div>
-
-      <a class="village__scroll" href="#quests" aria-label="Scroll to quests">▼</a>
     </div>
   </section>
+
+  <!-- Modal shell: game interactions clone portfolio sections in here -->
+  <div class="modal" id="modal" hidden role="dialog" aria-modal="true">
+    <div class="modal__panel">
+      <button class="modal__close btn btn--blue" id="modal-close" aria-label="Close">✕ Close</button>
+      <div class="modal__content" id="modal-content"></div>
+    </div>
+  </div>
 
   <main>
 
@@ -210,7 +218,7 @@
           <div class="inv-card reveal">
             <h3>🛡️ M.S. Information Technology <small>Cybersecurity</small></h3>
             <p class="camp__where">Westcliff University · Irvine, USA</p>
-            <p class="camp__when">2024 – 2026 · <span class="chip chip--amber">⚡ IN PROGRESS</span></p>
+            <p class="camp__when">2024 – 2026 · <span class="chip chip--green">✅ COMPLETED</span></p>
             <p class="camp__desc">Specialized security training: threat defense, compliance, and secure systems — sharpening the frontier's defenses.</p>
           </div>
           <div class="inv-card reveal">
@@ -240,11 +248,12 @@
         <h2 class="zone__title"><span class="zone__emoji">📡</span> Signal Fire <small>· Contact</small></h2>
         <p class="zone__lead">Send a raven — or, more reliably, an email.</p>
         <div class="signal__actions">
-          <a class="btn btn--blue" href="mailto:singh.tribh1108@gmail.com">✉️ singh.tribh1108@gmail.com</a>
+          <a class="btn btn--blue" href="mailto:singh.tribh1108@gmail.com">✉️ Email</a>
           <a class="btn btn--amber" href="https://linkedin.com/in/singhtribh" target="_blank" rel="noopener">💼 LinkedIn</a>
           <a class="btn btn--green" href="https://github.com/tsmanral" target="_blank" rel="noopener">🐙 GitHub</a>
+          <a class="btn btn--amber" href="assets/Tribhuwan_Singh_Resume.pdf" download="Tribhuwan_Singh_Resume.pdf">📄 Download Resume</a>
         </div>
-        <p class="signal__loc">📍 Bengaluru, India · +91 757-921-1055</p>
+        <p class="signal__loc">📍 Bengaluru, India</p>
       </div>
     </section>
   </main>
@@ -254,5 +263,6 @@
   </footer>
 
   <script src="js/survival.js" defer></script>
+  <script src="js/game.js" defer></script>
 </body>
 </html>
