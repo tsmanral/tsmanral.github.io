@@ -1,568 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="">
-  <meta name="author" content="">
-
-  <title>Resume</title>
-
-  <!-- Bootstrap core CSS -->
-  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Custom fonts for this template -->
-  <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet">
-  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.rawgit.com/konpa/devicon/df6431e323547add1b4cf45992913f15286456d3/devicon.min.css">
-
-  <!-- Custom styles for this template -->
-  <link href="css/resume.min.css" rel="stylesheet">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tribhuwan Singh — Software Developer. Arctic survival–themed interactive portfolio.">
+  <meta name="author" content="Tribhuwan Singh">
+  <meta name="theme-color" content="#000450">
+  <title>Tribhuwan Singh · Survivor's Frontier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/survival.css">
+  <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;❄️&lt;/text&gt;&lt;/svg&gt;">
 </head>
+<body>
 
-<body id="page-top">
+  <!-- Atmospheric snowfall (hardware-accelerated canvas, behind everything) -->
+  <canvas id="snow-canvas" aria-hidden="true"></canvas>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
-    <a class="navbar-brand js-scroll-trigger" href="#page-top">
-      <span class="d-block d-lg-none">Tribhuwan Singh</span>
-      <span class="d-none d-lg-block">
-        <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="img/profile.jpg" alt="">
-      </span>
+  <!-- ===== HUD NAV ===== -->
+  <header class="hud" id="hud">
+    <a class="hud__brand" href="#basecamp">
+      <span class="hud__flame">🔥</span>
+      <span>Survivor's&nbsp;Frontier</span>
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#about">About</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#education">Education</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#experience">Experience</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#extracurricular">Extracurricular</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#skills">Skills</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#awards">Honor &amp; Awards</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#project">Projects</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#publication">Publication</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link js-scroll-trigger" href="#interests">Interests</a>
-        </li>
-      </ul>
+    <nav class="hud__nav" id="hud-nav" aria-label="Main">
+      <a href="#basecamp">🏕️ Base Camp</a>
+      <a href="#quests">📜 Main Quests</a>
+      <a href="#inventory">🎒 Inventory</a>
+      <a href="#training">🎓 Training</a>
+      <a href="#expeditions">🗺️ Expeditions</a>
+      <a href="#signal">📡 Signal Fire</a>
+    </nav>
+    <button class="hud__toggle" id="hud-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+  </header>
+
+  <!-- ===== HOME / SURVIVOR'S VILLAGE ===== -->
+  <section class="village" id="basecamp">
+    <div class="village__map" role="img" aria-label="Isometric arctic survivor village with log cabins and a central bonfire"></div>
+    <div class="village__vignette"></div>
+
+    <div class="village__content">
+      <p class="village__kicker">❄️ DAY 1,460 OF THE EXPEDITION · BENGALURU OUTPOST</p>
+      <h1 class="village__title">Tribhuwan <span>Singh</span></h1>
+      <p class="village__subtitle">Software Developer · Backend &amp; Distributed Systems · Lv. 4+ yrs</p>
+
+      <!-- Interactive NPC guide -->
+      <div class="npc" id="npc">
+        <div class="npc__avatar">
+          <img src="img/arctic-explorer.png" alt="Arctic Explorer guide" width="96" height="96" loading="eager">
+        </div>
+        <div class="npc__bubble">
+          <p class="npc__name">Arctic Explorer <span class="npc__tag">GUIDE</span></p>
+          <p class="npc__text" id="npc-text" aria-live="polite"></p>
+          <div class="npc__actions">
+            <button class="btn btn--amber" id="npc-next">Continue ▸</button>
+            <span class="npc__progress" id="npc-progress"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quest hubs: clickable village navigation -->
+      <div class="hubs" aria-label="Quest hubs">
+        <a class="hub" href="#quests"><span class="hub__icon">📜</span><span class="hub__label">Main Quests</span><span class="hub__hint">Work Experience</span></a>
+        <a class="hub" href="#inventory"><span class="hub__icon">🎒</span><span class="hub__label">Equipment</span><span class="hub__hint">Skills</span></a>
+        <a class="hub" href="#training"><span class="hub__icon">🎓</span><span class="hub__label">Training Camp</span><span class="hub__hint">Education</span></a>
+        <a class="hub" href="#expeditions"><span class="hub__icon">🗺️</span><span class="hub__label">Expeditions</span><span class="hub__hint">GitHub Projects</span></a>
+      </div>
+
+      <a class="village__scroll" href="#quests" aria-label="Scroll to quests">▼</a>
     </div>
-  </nav>
+  </section>
 
-  <div class="container-fluid p-0">
+  <main>
 
-    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="about">
-      <div class="w-100">
-        <h1 class="mb-0">Tribhuwan
-          <span class="text-primary">Singh</span>
-        </h1>
-        <div class="subheading mb-5">Seattle, WA ·
-          <a href="mailto:name@email.com">singh.tr@northeastern.edu</a>
-        </div>
-        <p class="lead mb-5">I try to be a resourceful individual who loves to generate new ideas and devise feasible solutions to broadly 
-          relevant problems. My goal is to use my diverse skill set to develop and promote technologies. I’ve got the strongest incentive to 
-          advance as far as I can during this field and to find something that has not been known before. My core area of focus includes data 
-          analytics, machine learning, and Statistics. 
-          <br> <br>
-          I enjoy finding the hidden information and patterns behind a large volume of information and it is usually exciting to determine 
-          the results take off after an extended period of research design, data collection, and model set-up. I've conducted data analysis 
-          in various areas including the financial market. </p>
-        <div class="social-icons">
-	<a href="https://www.linkedin.com/in/tribhuwan-singh-9411a175/">
-            <i class="fab fa-linkedin-in"></i>
-          </a>
-          <a href="https://github.com/tsmanral">
-            <i class="fab fa-github"></i>
-          </a>
-	<!--
-          <a href="https://twitter.com/tribhuwan50">
-            <i class="fab fa-twitter"></i>
-          </a>
-	-->
-          <a href="https://www.facebook.com/tribhuwan50">
-            <i class="fab fa-facebook-f"></i>
-           </a>
-        </div>
-      </div>
-    </section>
+    <!-- ===== MAIN QUESTS / EXPERIENCE ===== -->
+    <section class="zone" id="quests">
+      <div class="zone__inner">
+        <h2 class="zone__title"><span class="zone__emoji">📜</span> Main Quests <small>· Professional Experience</small></h2>
+        <p class="zone__lead">Completed campaign chapters from the frontier. Every quest shipped to production.</p>
 
-
-	<hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="education">
-      <div class="w-100">
-        <h2 class="mb-5">Education</h2>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Northeastern University</h3>
-            <div class="subheading mb-3">Master of Science</div>
-            <div>Data Analytics Engineering</div>
-            <p>GPA: 4.0</p>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">August 2019 - May 2021</span>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between">
-          <div class="resume-content">
-            <h3 class="mb-0">DIT University </h3>
-            <div class="subheading mb-3"> Bachelor of Technology </div>
-            <div>Computer Science and Engineering</div>
-            <p>GPA: 8.11</p>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">August 2014 - May 2018</span>
-          </div>
-        </div>
-
-      </div>
-      </section>
-
-
-    <hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex justify-content-center" id="experience">
-      <div class="w-100">
-        <h2 class="mb-5">Experience</h2>
-	      
-	<div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Software Developer / Data Engineer</h3>
-            <div class="subheading mb-3">IBM</div>
-          </div>
-          <div class="resume-place-date text-md-right">
-            <p><span class = "text-primary">Greater Seattle Area</span></p>
-            <p><span class="text-primary">October 2021 - Present</span></p>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Data Analytics Intern</h3>
-            <div class="subheading mb-3">The Money Roller</div>
-            <ul>
-            	<li>Analyzed the crowd sentiment behind each and every data parameter and identified patterns in derivatives data during various price trends from the underlying FnO data. 
-				</li>
-				<li>
-				Analyzed the current financial markets by using Derivatives Data and to create new F&O strategies based on empirical evidence gathered from the historical spot and FnO data. Predicted Financial health of 5 sectors using Financial and Ratio Analysis
-				</li>
-				<li>
-          Designed several discriminative methods to perform a comparative analysis to speculate the value of a firm.
-          		</li>
+        <article class="quest reveal">
+          <header class="quest__head quest__head--amber">
+            <div>
+              <h3>Senior Software Developer</h3>
+              <p class="quest__meta">IBM · Seattle, USA</p>
+            </div>
+            <div class="quest__badge">
+              <span class="quest__status">✅ QUEST COMPLETE</span>
+              <span class="quest__dates">May 2023 – Apr 2025</span>
+            </div>
+          </header>
+          <ul class="quest__log">
+            <li>Led full-stack ownership of <b>5+ customer-facing products</b> and core infrastructure — high-throughput APIs handling <b>100K+ daily records</b> at <b>99.9% reliability</b>, with a <b>90% reduction</b> in security vulnerabilities via WhiteSource, ASoC, and OWASP ZAP.</li>
+            <li>Cut Reporting API query latency by <b>40%</b> at 100K+ daily requests with Redis caching (Java Spring Boot + Lettuce) and reliability-focused design patterns.</li>
+            <li>Deployed Instana and New Relic monitoring, reducing unplanned downtime <b>25%</b> across post-purchase experiences with real-time alerting and async caching workflows.</li>
+            <li>Hit <b>100% uptime SLA</b> and cut costs <b>30%</b> through PostgreSQL migration and Apache NiFi ETL automation across 3 production environments.</li>
+            <li>Built asynchronous AWS Lambda ETL pipelines processing <b>1M+ inventory records daily</b> into S3 and Redshift, with Kafka event streams powering ML-driven customer targeting and abuse prevention.</li>
           </ul>
+          <div class="quest__rewards">
+            <span class="chip chip--green">+XP Reliability 99.9%</span>
+            <span class="chip chip--blue">Loot: Redis Cache</span>
+            <span class="chip chip--amber">Boss defeated: Latency −40%</span>
           </div>
-          <div class="resume-place-date text-md-right">
-            <p><span class = "text-primary">Mumbai, India</span></p>
-            <p><span class="text-primary">April 2017 - July 2017</span></p>
+        </article>
+
+        <article class="quest reveal">
+          <header class="quest__head quest__head--blue">
+            <div>
+              <h3>Software Developer</h3>
+              <p class="quest__meta">IBM · Seattle, USA</p>
+            </div>
+            <div class="quest__badge">
+              <span class="quest__status">✅ QUEST COMPLETE</span>
+              <span class="quest__dates">Oct 2021 – Apr 2023</span>
+            </div>
+          </header>
+          <ul class="quest__log">
+            <li>Aligned <b>20+ API schemas</b> and standardized Java data handling for <b>100% audit readiness</b> across SOC 2 compliance reviews.</li>
+            <li>Reduced data-migration defect rate <b>35%</b> with Python ETL automation and embedded validation, orchestrating distributed ingestion via Apache NiFi across cloud and on-prem.</li>
+            <li>Executed <b>5+ zero-downtime database migrations</b> across PostgreSQL and NoSQL platforms with 100% data integrity and <b>25% faster queries</b> across 3 product lines.</li>
+            <li>Enforced code reviews, source control, and build processes across 4+ microservices — vulnerability scanning in CI/CD cut remediation cycle time <b>50%</b>.</li>
+            <li>Designed real-time dashboards for 15+ engineers (Apache Superset + CloudWatch), reducing mean time to detect incidents by <b>30%</b>.</li>
+          </ul>
+          <div class="quest__rewards">
+            <span class="chip chip--green">+XP SOC 2: 100% audit-ready</span>
+            <span class="chip chip--blue">Loot: Zero-downtime migrations</span>
+            <span class="chip chip--amber">Skill unlocked: DevSecOps</span>
           </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">PROGRAMMING INTERN</h3>
-            <div class="subheading mb-3">Hackr.io</div>
-            <ul>
-            	<li>
-            		Improved infrastructure for storing and managing user activity feeds at least by 30%.
-            	</li>
-            	<li>
-            		Designed database schemas with complex entity relationships to reduce memory usage. 
-            	</li>
-              <li>
-                Integrated a Machine Learning module using Flask that recommends users with courses and tutorials.
-              </li>
-            </ul>
-          </div>
-          <div class="resume-place-date text-md-right">
-            <p><span class = "text-primary">Roorkee, India</span></p>
-            <p><span class="text-primary">June 2017 - July 2017</span></p>
-          </div>
-        </div>
-
-      </div>
-    </section>
-	
-	
-	<hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex justify-content-center" id="extracurricular">
-      <div class="w-100">
-        <h2 class="mb-5">EXTRACURRICULAR  ACTIVITIES</h2>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">IGNITUS SCHOLAR</h3>
-            <div class="subheading mb-3">IGNITUS</div>
-            <p>I collaborated with other students,  professionals, and dropouts to work on GANs research papers.</p>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">August 2018 - May 2019</span>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between">
-          <div class="resume-content">
-            <h3 class="mb-0">Volunteer</h3>
-            <div class="subheading mb-3">HIMALAYAN INSTITUTE FOR SUSTAINABLE ENVIRONMENT AND RESEARCH SOCIETY</div>
-            <p>I was involved in awareness education and outreach activities related to Waste Management, Wildlife Conservation, and Health issues in various schools, villages, and towns and other districts of Uttarakhand State of India.</p>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">July 2016 - June 2017</span>
-          </div>
-        </div>
-
-
-       </div>
-    </section>
-
-
-    <hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="skills">
-      <div class="w-100">
-        <h2 class="mb-5">Skills</h2>
-
-        <div class="subheading mb-3">Programming Languages &amp; Tools</div>
-        <ul class="list-inline dev-icons">
-          <li class="list-inline-item">
-            <i class="fab fa-r-project"></i>
-          </li>
-          <li class="list-inline-item">
-            <i class="devicon-python-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-csharp-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-javascript-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-mysql-plain"></i>
-          </li> 
-          <li class="list-inline-item">
-          	<i class="devicon-mongodb-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-postgresql-plain"></i>
-          </li>         
-          <li class="list-inline-item">
-          	<i class="devicon-git-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-dot-net-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-visualstudio-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-ubuntu-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-docker-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-github-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-linux-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-pycharm-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-redhat-plain"></i>
-          </li>
-          <li class="list-inline-item">
-          	<i class="devicon-amazonwebservices-plain"></i>
-          </li>
-        </ul>
-
-        <div class="subheading mb-3">COURSEWORK</div>
-        <ul class="fa-ul mb-0">
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Engineering Probability and Statistics</li>
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Data Management and Database Design</li>
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Computation and Visualization</li>
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Statistical Methods in Engineering</li>
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Data Mining in Engineering</li>
-          <li>
-            <i class="fa-li fa fa-check"></i>
-            Deterministic Operations Research
-          </li>  
-        </ul>
+        </article>
       </div>
     </section>
 
+    <!-- ===== EQUIPMENT INVENTORY / SKILLS ===== -->
+    <section class="zone zone--alt" id="inventory">
+      <div class="zone__inner">
+        <h2 class="zone__title"><span class="zone__emoji">🎒</span> Equipment Inventory <small>· Skills</small></h2>
+        <p class="zone__lead">Gear collected across four years of enterprise survival. Hover a slot to inspect.</p>
 
-    <hr class="m-0">
+        <div class="inv-grid">
+          <div class="inv-card reveal">
+            <h3>⚔️ Weapons <small>Languages</small></h3>
+            <div class="inv-items">
+              <span class="slot">Java</span><span class="slot">Python</span><span class="slot">TypeScript</span>
+              <span class="slot">JavaScript</span><span class="slot">SQL</span><span class="slot">C#</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:95%"></div><span>Mastery 95%</span></div>
+          </div>
 
-    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="awards">
-      <div class="w-100">
-        <h2 class="mb-5">Honors &amp; Awards</h2>
-        <ul class="fa-ul mb-0">
-          <li>
-            <i class="fa-li fa fa-trophy text-warning"></i>
-            Dean’s Seattle Leaders and Scholar’s Award - Northeastern University </li>
-          <li>
-            <i class="fa-li fa fa-trophy text-warning"></i>
-            Certificate of Merit in the silver category - DIT University - Best Undergraduate Project for senior year</li>
-          <li>
-            <i class="fa-li fa fa-trophy text-warning"></i>
-            3<sup>rd</sup>
-            Place - DIT University - CodeChaos 2016</li>
-        </ul>
+          <div class="inv-card reveal">
+            <h3>🛡️ Armor <small>Backend &amp; Systems</small></h3>
+            <div class="inv-items">
+              <span class="slot">Spring Boot</span><span class="slot">Node.js</span><span class="slot">Flask</span>
+              <span class="slot">PostgreSQL</span><span class="slot">MongoDB</span><span class="slot">Redis</span>
+              <span class="slot">Microservices</span><span class="slot">Event-driven</span><span class="slot">Concurrency</span>
+              <span class="slot">Caching</span><span class="slot">Secure SDLC</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:92%"></div><span>Mastery 92%</span></div>
+          </div>
+
+          <div class="inv-card reveal">
+            <h3>🗺️ Mounts <small>Cloud &amp; Infra (AWS)</small></h3>
+            <div class="inv-items">
+              <span class="slot">Lambda</span><span class="slot">S3</span><span class="slot">EC2</span><span class="slot">RDS</span>
+              <span class="slot">Redshift</span><span class="slot">SQS</span><span class="slot">MSK</span><span class="slot">DynamoDB</span>
+              <span class="slot">Kubernetes</span><span class="slot">Docker</span><span class="slot">Terraform</span><span class="slot">OpenShift</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:88%"></div><span>Mastery 88%</span></div>
+          </div>
+
+          <div class="inv-card reveal">
+            <h3>🧪 Potions <small>Data Engineering &amp; ML</small></h3>
+            <div class="inv-items">
+              <span class="slot">Apache Spark</span><span class="slot">PySpark</span><span class="slot">Databricks</span>
+              <span class="slot">Apache NiFi</span><span class="slot">Kafka</span><span class="slot">ETL Automation</span>
+              <span class="slot">ML Integrations</span><span class="slot">Data Warehousing</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:85%"></div><span>Mastery 85%</span></div>
+          </div>
+
+          <div class="inv-card reveal">
+            <h3>🏹 Traps <small>DevSecOps &amp; CI/CD</small></h3>
+            <div class="inv-items">
+              <span class="slot">GitLab CI/CD</span><span class="slot">Jenkins</span><span class="slot">OWASP ZAP</span>
+              <span class="slot">WhiteSource</span><span class="slot">ASoC</span><span class="slot">Twistlock</span>
+              <span class="slot">Vulnerability Scanning</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:90%"></div><span>Mastery 90%</span></div>
+          </div>
+
+          <div class="inv-card reveal">
+            <h3>🔭 Scout Tools <small>Observability &amp; Ops</small></h3>
+            <div class="inv-items">
+              <span class="slot">New Relic</span><span class="slot">Instana</span><span class="slot">ELK Stack</span>
+              <span class="slot">CloudWatch</span><span class="slot">Apache Superset</span><span class="slot">JMeter</span>
+              <span class="slot">Jest</span><span class="slot">JUnit</span>
+            </div>
+            <div class="xpbar"><div class="xpbar__fill" style="--xp:87%"></div><span>Mastery 87%</span></div>
+          </div>
+        </div>
       </div>
     </section>
 
-
-    <hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex justify-content-center" id="project">
-      <div class="w-100">
-        <h2 class="mb-5">Projects</h2>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0"><b>THESIS:</b> Trajectory Prediction through Deep Reinforcement Learning in Unity</h3>
-            <ul>
-            	<li>Trained an agent to learn a conditioned trajectory inside a polytope to reach the goal using the nature_cnn visual encoder. 
-              </li>
-              <li>
-                Developed GUI of the game playable by humans and the AI using Generative Adversarial Imitation Learning.
-              </li>
-              <li>
-                Utilizing Tensorflow with Reinforcement learning in Unity alongwith mlagents package to train the game
-              </li>
-            </ul>
+    <!-- ===== TRAINING CAMP / EDUCATION ===== -->
+    <section class="zone" id="training">
+      <div class="zone__inner">
+        <h2 class="zone__title"><span class="zone__emoji">🎓</span> Training Camps <small>· Education</small></h2>
+        <div class="inv-grid inv-grid--two">
+          <div class="inv-card reveal">
+            <h3>🛡️ M.S. Information Technology <small>Cybersecurity</small></h3>
+            <p class="camp__where">Westcliff University · Irvine, USA</p>
+            <p class="camp__when">2024 – 2026 · <span class="chip chip--amber">⚡ IN PROGRESS</span></p>
+            <p class="camp__desc">Specialized security training: threat defense, compliance, and secure systems — sharpening the frontier's defenses.</p>
           </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">May 2020 - April 2021</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/Trajectory-Prediction-Through-Deep-Reinforcement-Learning-in-Unity">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
+          <div class="inv-card reveal">
+            <h3>📊 M.S. Data Analytics Engineering <small>Data &amp; ML</small></h3>
+            <p class="camp__where">Northeastern University · Seattle, USA</p>
+            <p class="camp__when">2019 – 2021 · <span class="chip chip--green">✅ COMPLETED</span></p>
+            <p class="camp__desc">Deep training in analytics, machine learning, and large-scale data engineering.</p>
           </div>
         </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Predicting Restaurants’ Popularity Based On Yelp Dataset</h3>
-            <ul>
-            	<li>
-                The goal of this project was to predict the actual star rating based on the textual review given by a user with less than 5% error. 
-              </li>
-              <li>
-                We calculated the true rating using Sentiment Analysis and used LSTM prediction model alongwith Simple RNN and FFN to later compare the models. Concluded that LSTM performs slightly better than the Polynomial Regression and Feed Forward ANN.
-              </li>
-            	<li>
-            		Utilized Python 3, R, Keras, and Tensorflow 
-            	</li>
-            </ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">Jan 2020 - May 2020</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/Predicting-Restaurants--Popularity-Based-On-Yelp-Dataset">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">CO2 Emission Pattern Recognition: Interactive Analysis and Graphical Visualization</h3>
-            <ul>
-            	<li>
-                Designed, developed, and maintained R Shiny application to visualize USA Carbon emission.  
-              </li>
-            	<li>
-            		Estimated CO2 emission using ANNs based on average household carbon footprints (HCF) with less than 2% error. 
-            	</li>
-              <li>
-            		Utilized R, Keras, Shiny and Tensorflow 
-            	</li>
-            </ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">Jan 2020 - May 2020</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/CO2-Emission-Pattern-Recognition">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Royal Game Of UR GUI Based AI Solver</h3>
-            <ul>
-            	<li>
-                Developed AI mechanics for GUI based implementation of the Royal Game of UR. Working on the genetic algorithm which should at least provide 20% better optimal solution.
-              </li>
-            	<li>
-            		Utilized Unity 2018.4.28f1, C#, and VSCode 1.51.0 
-            	</li>
-            </ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">Feb 2020 - July 2020</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/RoyalGameOfUR-GUI">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">SNA MEASURE OF LA LIGA MATCHES</h3>
-            <ul>
-            	<li>
-                Performed detailed Network Analysis on 15 soccer matches based on static representations. Additionally, Studied 8 different social relations of each match with the aggregated model to inspect players and the teams.         
-              </li>
-            	<li>
-            		Utilized Gephi and R. 
-            	</li>
-            </ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">June 2019 - Sept 2019</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/SNA_Soccer">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">AUTHOR PREDICTION USING DEEP LEARNING</h3>
-            <ul>
-            	<li>
-                The goal is to develop a deep learning model that can predict the author of a given text document (book/novel) from an asset of target authors. 
-              </li>
-              <li>
-                We used original text as well as grammatical structure(Parts-of-Speech) for training and achieved over 99% 
-                accuracy using the grammatical structure of the text. Developed and trained Feedforward, Convolution, and LSTM models on Corpus 
-                of English Novels(CEN) to predict the author of a given novel.       
-				      </li>
-            	<li>
-            		Utilized Python, Keras, and Tensorflow 
-            	</li>
-            </ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">Oct 2017 - April 2018</span>
-            <div class="social-icons">
-              <a href="https://github.com/tsmanral/Author-Prediction-Using-Deep-Learning-Models">
-                <i class="fab fa-github"></i>
-              </a>
-            </div>
-          </div>
-        </div>
-
       </div>
     </section>
 
-
-    <hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex justify-content-center" id="publication">
-      <div class="w-100">
-        <h2 class="mb-5">Publication</h2>
-	
-	<div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Trajectory Prediction through Deep Reinforcement Learning in Unity</h3>
-            <div class="subheading mb-3">ProQuest | 2021. 28264936</div>
-            <ul>
-            	<li>Trained an artificial agent that can learn a conditioned trajectory to model human motion inside a polytope using imitation learning. 
-				</li>
-			</ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">May 2022</span>
-          </div>
+    <!-- ===== EXPEDITION ARCHIVES / PROJECTS ===== -->
+    <section class="zone zone--alt" id="expeditions">
+      <div class="zone__inner">
+        <h2 class="zone__title"><span class="zone__emoji">🗺️</span> Expedition Archives <small>· GitHub Projects</small></h2>
+        <p class="zone__lead">Field reports pulled live from <a href="https://github.com/tsmanral" target="_blank" rel="noopener">github.com/tsmanral</a>. Click a card to open the repository.</p>
+        <div class="proj-grid" id="proj-grid">
+          <!-- Populated by js/survival.js (live GitHub API with static fallback) -->
         </div>
-	      
-	      
-        <div class="resume-item d-flex flex-column flex-md-row justify-content-between mb-5">
-          <div class="resume-content">
-            <h3 class="mb-0">Predicting Parole hearing result using Machine Learning</h3>
-            <div class="subheading mb-3">IEEE | DOI: 10.1109/ICETCCT.2017.8280342</div>
-            <ul>
-            	<li>Trained a machine learning model with criminals in New York State that would then be able to predict whether a 
-                  criminal would be granted parole or not with an accuracy of 76.8%. 
-				</li>
-			</ul>
-          </div>
-          <div class="resume-date text-md-right">
-            <span class="text-primary">February 2018</span>
-          </div>
-        </div>
-
       </div>
     </section>
 
-
-    <hr class="m-0">
-
-    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="interests">
-      <div class="w-100">
-        <h2 class="mb-5">Interests</h2>
-        <p>Apart from being a data analyst, I enjoy most of my time with workout, playing chess, volunteering for NGOs and traveling. </p>
-        <p class="mb-0">I enjoy cooking, and I spend a large amount of my free time experimenting with my recipes.</p>
+    <!-- ===== SIGNAL FIRE / CONTACT ===== -->
+    <section class="zone" id="signal">
+      <div class="zone__inner zone__inner--center">
+        <h2 class="zone__title"><span class="zone__emoji">📡</span> Signal Fire <small>· Contact</small></h2>
+        <p class="zone__lead">Send a raven — or, more reliably, an email.</p>
+        <div class="signal__actions">
+          <a class="btn btn--blue" href="mailto:singh.tribh1108@gmail.com">✉️ singh.tribh1108@gmail.com</a>
+          <a class="btn btn--amber" href="https://linkedin.com/in/singhtribh" target="_blank" rel="noopener">💼 LinkedIn</a>
+          <a class="btn btn--green" href="https://github.com/tsmanral" target="_blank" rel="noopener">🐙 GitHub</a>
+        </div>
+        <p class="signal__loc">📍 Bengaluru, India · +91 757-921-1055</p>
       </div>
     </section>
+  </main>
 
-  </div>
+  <footer class="footer">
+    <p>❄️ Built at the Survivor's Frontier · © <span id="year"></span> Tribhuwan Singh · <a href="https://github.com/tsmanral/tsmanral.github.io" target="_blank" rel="noopener">Source</a></p>
+  </footer>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Plugin JavaScript -->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-  <!-- Custom scripts for this template -->
-  <script src="js/resume.min.js"></script>
-
+  <script src="js/survival.js" defer></script>
 </body>
-
 </html>
